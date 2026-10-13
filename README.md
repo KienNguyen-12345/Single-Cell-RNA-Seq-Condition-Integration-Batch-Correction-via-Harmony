@@ -1,53 +1,99 @@
-# Single-Cell RNA-Seq Condition Integration & Batch Correction via Harmony
+Single-Cell RNA-Seq Integration and Differential Expression with Harmony & Seurat
 
-## Overview
-This repository contains an R-based single-cell RNA sequencing (scRNA-seq) workflow demonstrating dataset integration across experimental conditions using the **Harmony** algorithm within the **Seurat** framework. The analysis integrates peripheral blood mononuclear cells (PBMCs) from control and interferon-beta (IFN-β) stimulated conditions to correct condition-level batch variation and enable cell-type-specific differential evaluation.
+A reproducible R workflow demonstrating batch effect correction, cell type annotation, and condition-specific differential expression analysis using Seurat (v5) and Harmony.
 
----
+Overview
 
-## Dataset
-* **Source:** `ifnb` dataset from `SeuratData`
-* **Study Design:** PBMCs from 8 lupus patients split into two experimental conditions:
-  * **CTRL:** Control / Untreated
-  * **STIM:** Simulated / IFN-β treated
-* **Goal:** Overlay shared immune cell populations across conditions to enable unbiased comparative transcriptomic analysis.
+Dataset: Peripheral blood mononuclear cells (PBMCs) from systemic lupus erythematosus (SLE) patients split into interferon-beta stimulated (STIM) and unstimulated control (CTRL) conditions (SeuratData::ifnb).
 
----
+Primary Objective: Integrate multi-condition scRNA-seq profiles across experimental batches to align shared cell states and identify condition-dependent transcriptional perturbations.
 
-## Analytical Pipeline & Workflow
+Key Analytical Approaches:
 
-### 1. Quality Control & Filtering
-* Evaluated mitochondrial read percentages (`pattern = "^MT-"`) and UMI counts per cell.
-* Filtered low-quality cells maintaining `nCount_RNA > 800`.
+Low-dimensional embedding integration via Harmony.
 
-### 2. Standard Pre-processing
-* Log-normalization (`NormalizeData`) and highly variable feature selection (`FindVariableFeatures`).
-* Data scaling (`ScaleData`) and Principal Component Analysis (`RunPCA`).
-* Baseline UMAP reduction showing clear condition-driven separation prior to batch correction.
+Automated reference-based cell type annotation using SingleR and celldex.
 
-### 3. Automated Cell-Type Annotation
-* Converted Seurat object to `SingleCellExperiment` format.
-* Mapped cell identities using `SingleR` against the `celldex::HumanPrimaryCellAtlasData` reference dataset.
-* Added predicted cell labels back to Seurat metadata for downstream verification.
+Identification of cell-state conserved markers alongside treatment-responsive marker discovery using DESeq2 and Seurat testing suites.
 
-### 4. Integration with Harmony
-* Executed `RunHarmony(group.by.vars = 'stim')` on low-dimensional PCA embeddings.
-* Performed downstream graph-based clustering (`FindNeighbors`, `FindClusters`) and UMAP reduction using the corrected `harmony` embeddings rather than raw PCs.
+Workflow Architecture
 
-### 5. Visualization & Validation
-* Generated side-by-side comparative UMAP plots (`before` vs. `after` Harmony integration).
-* Verified successful alignment and overlay of corresponding immune cell lineages across `CTRL` and `STIM` groups.
+flowchart TD
+    A[Load IFNB Dataset] --> B[QC & Filtering: nCount_RNA > 800, MT%]
+    B --> C[Standard Seurat Workflow: Normalize, Scale, PCA]
+    C --> D[Unintegrated DimPlot: Separation by 'stim']
+    C --> E[Automated Annotation via SingleR + HPCA]
+    C --> F[RunHarmony: Correct Embeddings by 'stim']
+    F --> G[Harmony-based Neighbors, Clusters & UMAP]
+    G --> H[Conserved Marker Discovery: FindConservedMarkers]
+    G --> I[Condition Split: celltype.condition]
+    I --> J[Differential Expression: FindMarkers STIM vs CTRL]
 
----
 
-## Key Dependencies & R Packages
-* **Seurat / SeuratData:** Core scRNA-seq processing & data container
-* **harmony:** Fast, scalable batch-effect integration
-* **SingleR / celldex:** Automated reference-based cell-type annotation
-* **SingleCellExperiment:** Interoperability conversion
-* **ggplot2 / ggpubr:** Data visualization & figure layout
+Pipeline Steps
 
----
+1. Quality Control & Preprocessing
 
-## Results Summary
-Before integration, cells clustered primarily by experimental treatment condition (`CTRL` vs `STIM`). Following Harmony integration, cell clusters aligned strictly by biological cell type (e.g., T cells, B cells, Monocytes) while preserving condition-specific expression shifts within each aligned cluster.
+Calculated mitochondrial gene percentage (PercentageFeatureSet(pattern = "^MT-")).
+
+Inspected feature-count distributions using FeatureScatter, VlnPlot, and metadata boxplots.
+
+Filtered low-quality cells retaining barcodes with nCount_RNA > 800.
+
+2. Standard Processing & Unintegrated Baseline
+
+Log-normalized gene expression (NormalizeData), selected top highly variable genes (FindVariableFeatures), and scaled variance (ScaleData).
+
+Computed PCA components and evaluated dimensionality with ElbowPlot.
+
+Generated baseline UMAP projections confirming significant batch/condition separation driven by interferon stimulation (stim).
+
+3. Reference-Based Annotation
+
+Converted the Seurat object to SingleCellExperiment format.
+
+Queried the HumanPrimaryCellAtlasData reference from celldex via SingleR to project automated cell identity labels onto single cells.
+
+4. Batch Correction via Harmony
+
+Applied RunHarmony(group.by.vars = 'stim') on PCA embeddings to align cells across stimulation conditions while preserving biological variance.
+
+Computed neighborhood graphs (FindNeighbors), clustered cells at resolution = 0.5, and projected onto Harmony-corrected UMAP space.
+
+5. Marker Identification & Cell Type Resolution
+
+All Cluster Markers: Identified positive enriched genes with FindAllMarkers(test.use = 'DESeq2', logfc.threshold = 0.25, min.pct = 0.1).
+
+Conserved Markers: Evaluated condition-invariant identity markers across stim groups using FindConservedMarkers() (identifying canonical CD4 T cell markers such as HLA-DRA and HLA-DRB1).
+
+Renamed cluster identities to corresponding lineages (e.g., Cluster 3 annotated as CD4 Naive T).
+
+6. Condition-Specific Differential Expression
+
+Generated composite metadata identities (celltype.condition, e.g., CD4 Naive T_STIM vs. CD4 Naive T_CTRL).
+
+Executed FindMarkers() to isolate interferon-beta responsive genes (e.g., induction of IFIT3).
+
+Contrasted conserved vs. induced markers across conditions using split-view FeaturePlot panels.
+
+Dependencies
+
+Ensure the following R packages are installed before running Practice 5.R:
+
+# Bioconductor & CRAN packages
+install.packages(c("tidyverse", "ggplot2", "ggpubr", "devtools"))
+BiocManager::install(c("SingleCellExperiment", "celldex", "SingleR", "DESeq2"))
+
+# Harmony and Seurat packages
+install.packages("Seurat")
+install.packages("harmony")
+devtools::install_github("satijalab/seurat-data")
+
+
+Usage
+
+Open Practice 5.R in RStudio or your preferred IDE.
+
+Adjust your working directory if needed (setwd(...)).
+
+Run through sections sequentially to reproduce the integration embeddings, cluster assignments, and differential expression plots.
