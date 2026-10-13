@@ -1,14 +1,14 @@
 
 
   <h1>Single-Cell RNA-Seq Integration and Differential Expression with Harmony &amp; Seurat</h1>
-  <p>A reproducible R workflow demonstrating batch effect correction, cell type annotation, and condition-specific differential expression analysis using <strong>Seurat (v5)</strong> and <strong>Harmony</strong>[cite: 1].</p>
+  <p>A reproducible R workflow demonstrating batch effect correction, cell type annotation, and condition-specific differential expression analysis using <strong>Seurat (v5)</strong> and <strong>Harmony</strong>.</p>
 
   <hr>
 
   <h2>Overview</h2>
   <ul>
     <li><strong>Dataset:</strong> Peripheral blood mononuclear cells (PBMCs) from systemic lupus erythematosus (SLE) patients split into interferon-beta stimulated (<code>STIM</code>) and unstimulated control (<code>CTRL</code>) conditions (<code>SeuratData::ifnb</code>).</li>
-    <li><strong>Primary Objective:</strong> Integrate multi-condition scRNA-seq profiles across experimental batches to align shared cell states and identify condition-dependent transcriptional perturbations[cite: 1].</li>
+    <li><strong>Primary Objective:</strong> Integrate multi-condition scRNA-seq profiles across experimental batches to align shared cell states and identify condition-dependent transcriptional perturbations.</li>
     <li><strong>Key Analytical Approaches:</strong>
       <ul>
         <li>Low-dimensional embedding integration via <strong>Harmony</strong>.</li>
@@ -69,27 +69,27 @@ Unintegrated DimPlot    Automated Annotation    RunHarmony: Correct
   <h3>4. Batch Correction via Harmony</h3>
   <ul>
     <li>Applied <code>RunHarmony(group.by.vars = 'stim')</code> on PCA embeddings to align cells across stimulation conditions while preserving biological variance.</li>
-    <li>Computed neighborhood graphs (<code>FindNeighbors</code>), clustered cells at <code>resolution = 0.5</code>, and projected onto Harmony-corrected UMAP space[cite: 1].</li>
+    <li>Computed neighborhood graphs (<code>FindNeighbors</code>), clustered cells at <code>resolution = 0.5</code>, and projected onto Harmony-corrected UMAP space.</li>
   </ul>
 
   <h3>5. Marker Identification &amp; Cell Type Resolution</h3>
   <ul>
-    <li><strong>All Cluster Markers:</strong> Identified positive enriched genes with <code>FindAllMarkers(test.use = 'DESeq2', logfc.threshold = 0.25, min.pct = 0.1)</code>[cite: 1].</li>
-    <li><strong>Conserved Markers:</strong> Evaluated condition-invariant identity markers across <code>stim</code> groups using <code>FindConservedMarkers()</code> (identifying canonical CD4 T cell markers such as <em>HLA-DRA</em> and <em>HLA-DRB1</em>)[cite: 1].</li>
-    <li>Renamed cluster identities to corresponding lineages (e.g., Cluster 3 annotated as <code>CD4 Naive T</code>)[cite: 1].</li>
+    <li><strong>All Cluster Markers:</strong> Identified positive enriched genes with <code>FindAllMarkers(test.use = 'DESeq2', logfc.threshold = 0.25, min.pct = 0.1)</code>.</li>
+    <li><strong>Conserved Markers:</strong> Evaluated condition-invariant identity markers across <code>stim</code> groups using <code>FindConservedMarkers()</code> (identifying canonical CD4 T cell markers such as <em>HLA-DRA</em> and <em>HLA-DRB1</em>).</li>
+    <li>Renamed cluster identities to corresponding lineages (e.g., Cluster 3 annotated as <code>CD4 Naive T</code>).</li>
   </ul>
 
   <h3>6. Condition-Specific Differential Expression</h3>
   <ul>
-    <li>Generated composite metadata identities (<code>celltype.condition</code>, e.g., <code>CD4 Naive T_STIM</code> vs. <code>CD4 Naive T_CTRL</code>)[cite: 1].</li>
-    <li>Executed <code>FindMarkers()</code> to isolate interferon-beta responsive genes (e.g., induction of <em>IFIT3</em>)[cite: 1].</li>
-    <li>Contrasted conserved vs. induced markers across conditions using split-view <code>FeaturePlot</code> panels[cite: 1].</li>
+    <li>Generated composite metadata identities (<code>celltype.condition</code>, e.g., <code>CD4 Naive T_STIM</code> vs. <code>CD4 Naive T_CTRL</code>).</li>
+    <li>Executed <code>FindMarkers()</code> to isolate interferon-beta responsive genes (e.g., induction of <em>IFIT3</em>).</li>
+    <li>Contrasted conserved vs. induced markers across conditions using split-view <code>FeaturePlot</code> panels.</li>
   </ul>
 
   <hr>
 
   <h2>Dependencies</h2>
-  <p>Ensure the following R packages are installed before running <code>Practice 5.R</code>[cite: 1]:</p>
+  <p>Ensure the following R packages are installed before running <code>Practice 5.R</code>:</p>
   <pre><code># Bioconductor &amp; CRAN packages
 install.packages(c("tidyverse", "ggplot2", "ggpubr", "devtools"))
 BiocManager::install(c("SingleCellExperiment", "celldex", "SingleR", "DESeq2"))
@@ -103,9 +103,9 @@ devtools::install_github("satijalab/seurat-data")</code></pre>
 
   <h2>Usage</h2>
   <ol>
-    <li>Open <code>Practice 5.R</code> in RStudio or your preferred IDE[cite: 1].</li>
-    <li>Adjust your working directory if needed (<code>setwd(...)</code>)[cite: 1].</li>
-    <li>Run through sections sequentially to reproduce the integration embeddings, cluster assignments, and differential expression plots[cite: 1].</li>
+    <li>Open <code>Practice 5.R</code> in RStudio or your preferred IDE.</li>
+    <li>Adjust your working directory if needed (<code>setwd(...)</code>).</li>
+    <li>Run through sections sequentially to reproduce the integration embeddings, cluster assignments, and differential expression plots.</li>
   </ol>
 
 </body>
