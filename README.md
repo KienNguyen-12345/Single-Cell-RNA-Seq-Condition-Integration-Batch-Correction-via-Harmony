@@ -7,13 +7,13 @@
 
   <h2>Overview</h2>
   <ul>
-    <li><strong>Dataset:</strong> Peripheral blood mononuclear cells (PBMCs) from systemic lupus erythematosus (SLE) patients split into interferon-beta stimulated (<code>STIM</code>) and unstimulated control (<code>CTRL</code>) conditions (<code>SeuratData::ifnb</code>)[cite: 1].</li>
+    <li><strong>Dataset:</strong> Peripheral blood mononuclear cells (PBMCs) from systemic lupus erythematosus (SLE) patients split into interferon-beta stimulated (<code>STIM</code>) and unstimulated control (<code>CTRL</code>) conditions (<code>SeuratData::ifnb</code>).</li>
     <li><strong>Primary Objective:</strong> Integrate multi-condition scRNA-seq profiles across experimental batches to align shared cell states and identify condition-dependent transcriptional perturbations[cite: 1].</li>
     <li><strong>Key Analytical Approaches:</strong>
       <ul>
-        <li>Low-dimensional embedding integration via <strong>Harmony</strong>[cite: 1].</li>
-        <li>Automated reference-based cell type annotation using <strong>SingleR</strong> and <code>celldex</code>[cite: 1].</li>
-        <li>Identification of cell-state conserved markers alongside treatment-responsive marker discovery using <code>DESeq2</code> and Seurat testing suites[cite: 1].</li>
+        <li>Low-dimensional embedding integration via <strong>Harmony</strong>.</li>
+        <li>Automated reference-based cell type annotation using <strong>SingleR</strong> and <code>celldex</code>.</li>
+        <li>Identification of cell-state conserved markers alongside treatment-responsive marker discovery using <code>DESeq2</code> and Seurat testing suites.</li>
       </ul>
     </li>
   </ul>
@@ -48,27 +48,27 @@ Unintegrated DimPlot    Automated Annotation    RunHarmony: Correct
 
   <h3>1. Quality Control &amp; Preprocessing</h3>
   <ul>
-    <li>Calculated mitochondrial gene percentage (<code>PercentageFeatureSet(pattern = "^MT-")</code>)[cite: 1].</li>
-    <li>Inspected feature-count distributions using <code>FeatureScatter</code>, <code>VlnPlot</code>, and metadata boxplots[cite: 1].</li>
-    <li>Filtered low-quality cells retaining barcodes with <code>nCount_RNA &gt; 800</code>[cite: 1].</li>
+    <li>Calculated mitochondrial gene percentage (<code>PercentageFeatureSet(pattern = "^MT-")</code>).</li>
+    <li>Inspected feature-count distributions using <code>FeatureScatter</code>, <code>VlnPlot</code>, and metadata boxplots.</li>
+    <li>Filtered low-quality cells retaining barcodes with <code>nCount_RNA &gt; 800</code>.</li>
   </ul>
 
   <h3>2. Standard Processing &amp; Unintegrated Baseline</h3>
   <ul>
-    <li>Log-normalized gene expression (<code>NormalizeData</code>), selected top highly variable genes (<code>FindVariableFeatures</code>), and scaled variance (<code>ScaleData</code>)[cite: 1].</li>
-    <li>Computed PCA components and evaluated dimensionality with <code>ElbowPlot</code>[cite: 1].</li>
-    <li>Generated baseline UMAP projections confirming significant batch/condition separation driven by interferon stimulation (<code>stim</code>)[cite: 1].</li>
+    <li>Log-normalized gene expression (<code>NormalizeData</code>), selected top highly variable genes (<code>FindVariableFeatures</code>), and scaled variance (<code>ScaleData</code>).</li>
+    <li>Computed PCA components and evaluated dimensionality with <code>ElbowPlot</code>.</li>
+    <li>Generated baseline UMAP projections confirming significant batch/condition separation driven by interferon stimulation (<code>stim</code>).</li>
   </ul>
 
   <h3>3. Reference-Based Annotation</h3>
   <ul>
-    <li>Converted the Seurat object to <code>SingleCellExperiment</code> format[cite: 1].</li>
-    <li>Queried the <code>HumanPrimaryCellAtlasData</code> reference from <code>celldex</code> via <code>SingleR</code> to project automated cell identity labels onto single cells[cite: 1].</li>
+    <li>Converted the Seurat object to <code>SingleCellExperiment</code> format.</li>
+    <li>Queried the <code>HumanPrimaryCellAtlasData</code> reference from <code>celldex</code> via <code>SingleR</code> to project automated cell identity labels onto single cells.</li>
   </ul>
 
   <h3>4. Batch Correction via Harmony</h3>
   <ul>
-    <li>Applied <code>RunHarmony(group.by.vars = 'stim')</code> on PCA embeddings to align cells across stimulation conditions while preserving biological variance[cite: 1].</li>
+    <li>Applied <code>RunHarmony(group.by.vars = 'stim')</code> on PCA embeddings to align cells across stimulation conditions while preserving biological variance.</li>
     <li>Computed neighborhood graphs (<code>FindNeighbors</code>), clustered cells at <code>resolution = 0.5</code>, and projected onto Harmony-corrected UMAP space[cite: 1].</li>
   </ul>
 
